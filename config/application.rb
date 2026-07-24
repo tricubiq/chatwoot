@@ -52,6 +52,18 @@ module Chatwoot
     enterprise_initializers = Rails.root.join('enterprise/config/initializers')
     Dir[enterprise_initializers.join('**/*.rb')].each { |f| require f } if enterprise_initializers.exist?
 
+    # rcx: load the custom/ extension overlay (same mechanism as enterprise/,
+    # already recognized by ChatwootApp.extensions but never autoloaded upstream)
+    if Rails.root.join('custom').exist?
+      config.eager_load_paths << Rails.root.join('custom/lib')
+      config.eager_load_paths << Rails.root.join('custom/listeners')
+      # rubocop:disable Rails/FilePath
+      config.eager_load_paths += Dir["#{Rails.root}/custom/app/**"]
+      # rubocop:enable Rails/FilePath
+      config.paths['app/views'].unshift('custom/app/views')
+      Dir[Rails.root.join('custom/config/initializers/**/*.rb')].each { |f| require f }
+    end
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading
