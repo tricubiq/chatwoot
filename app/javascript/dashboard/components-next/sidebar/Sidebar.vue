@@ -76,6 +76,12 @@ const hasAdvancedAssignment = computed(() => {
   );
 });
 
+// rcx: hide the Captain section entirely when the account feature flag is off,
+// instead of showing the upsell entry
+const hasCaptain = computed(() => {
+  return isFeatureEnabledonAccount.value(accountId.value, FEATURE_FLAGS.CAPTAIN);
+});
+
 const hasConversationUnreadCounts = computed(() => {
   return isFeatureEnabledonAccount.value(
     accountId.value,
@@ -492,7 +498,8 @@ const menuItems = computed(() => {
         },
       ],
     },
-    {
+    // rcx: minimal-diff conditional spread (same idea as isCallsAvailable below)
+    ...(hasCaptain.value ? [{
       name: 'Captain',
       icon: 'i-woot-captain',
       label: t('SIDEBAR.CAPTAIN'),
@@ -570,7 +577,7 @@ const menuItems = computed(() => {
           }),
         },
       ],
-    },
+    }] : []),
     ...(isCallsAvailable.value
       ? [
           {
