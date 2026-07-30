@@ -34,13 +34,12 @@ module ChatwootApp
   end
 
   def self.extensions
-    if custom?
-      %w[enterprise custom]
-    elsif enterprise?
-      %w[enterprise]
-    else
-      %w[]
-    end
+    # rcx: respect DISABLE_ENTERPRISE even when a custom/ overlay is present —
+    # upstream unconditionally re-enables the enterprise extension alongside custom
+    ext = []
+    ext << 'enterprise' if enterprise?
+    ext << 'custom' if custom?
+    ext
   end
 
   def self.advanced_search_allowed?
